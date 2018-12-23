@@ -3,15 +3,18 @@ package com.vu.pokedex;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.vu.pokedex.Adapter.PokemonAdapter;
 import com.vu.pokedex.Common.Common;
+import com.vu.pokedex.Common.ItemOffsetDecoration;
 import com.vu.pokedex.Model.Pokedex;
 import com.vu.pokedex.Model.Pokemon;
 import com.vu.pokedex.Retrofit.IPokeDex;
@@ -35,6 +38,7 @@ public class FragmentPokemonList extends Fragment {
     static FragmentPokemonList instance;
 
     RecyclerView recyclerView;
+    TextView pkm_sum;
 
     List<Pokemon> mList = new ArrayList<>();
     IPokeDex iPokeDex;
@@ -60,7 +64,10 @@ public class FragmentPokemonList extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pokemon_list, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.pkm_rcv_list);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),2));
+        ItemOffsetDecoration itemOffsetDecoration = new ItemOffsetDecoration(getActivity(),R.dimen.spacing);
+        recyclerView.addItemDecoration(itemOffsetDecoration);
+        pkm_sum = (TextView) view.findViewById(R.id.pkm_sum_list);
         fetchData();
         return view;
     }
@@ -75,6 +82,7 @@ public class FragmentPokemonList extends Fragment {
                         mList = pokedex.getPokemon();
                         PokemonAdapter adapter = new PokemonAdapter(getActivity(),mList);
                         recyclerView.setAdapter(adapter);
+                        pkm_sum.setText("Gen 1: " + String.valueOf(mList.size()));
                     }
                 }));
     }
