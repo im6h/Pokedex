@@ -40,7 +40,6 @@ public class FragmentPokemonList extends Fragment {
     RecyclerView recyclerView;
     TextView pkm_sum;
 
-    List<Pokemon> mList = new ArrayList<>();
     IPokeDex iPokeDex;
     CompositeDisposable compositeDisposable;
 
@@ -79,10 +78,10 @@ public class FragmentPokemonList extends Fragment {
                 .subscribe(new Consumer<Pokedex>() {
                     @Override
                     public void accept(Pokedex pokedex) throws Exception {
-                        mList = pokedex.getPokemon();
-                        PokemonAdapter adapter = new PokemonAdapter(getActivity(),mList);
+                        Common.mListPokemon = pokedex.getPokemon();
+                        PokemonAdapter adapter = new PokemonAdapter(getActivity(),Common.mListPokemon);
                         recyclerView.setAdapter(adapter);
-                        pkm_sum.setText("Gen 1: " + String.valueOf(mList.size()));
+                        pkm_sum.setText("Gen 1: " + String.valueOf(Common.mListPokemon.size()));
                     }
                 }));
     }
