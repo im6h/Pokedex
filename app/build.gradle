@@ -38,4 +38,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     // picasso
     implementation 'com.squareup.picasso:picasso:2.71828'
+
+    // chip view
+    implementation 'com.robertlevonyan.view:MaterialChipView:1.2.4'
 }

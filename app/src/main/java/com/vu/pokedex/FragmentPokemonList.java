@@ -91,4 +91,10 @@ public class FragmentPokemonList extends Fragment {
         compositeDisposable.clear();
         super.onStop();
     }
+
+    @Override
+    public void onDestroyView() {
+        compositeDisposable.clear();
+        super.onDestroyView();
+    }
 }

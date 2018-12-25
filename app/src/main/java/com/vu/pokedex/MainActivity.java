@@ -46,27 +46,54 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+    BroadcastReceiver showEvolution = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().toString().equals(Common.KEY_NUM_EVOLUTION)) {
+
+                // replace fragement
+                Fragment detailFragment = PokemonDetail.getInstance();
+                Bundle bundle = new Bundle();
+                String num = intent.getStringExtra("num");
+                bundle.putString("num",num);
+                detailFragment.setArguments(bundle);
+
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.remove(detailFragment);
+                fragmentTransaction.replace(R.id.fragment_list_pokemon, detailFragment);
+                fragmentTransaction.addToBackStack("Detail");
+                fragmentTransaction.commit();
+
+                // set pokemon name toolbar
+                Pokemon pokemon = Common.findPokemonByNum(num);
+                toolbar.setTitle(pokemon.getName());
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolBar);
-        toolbar.setTitle("Pokedex Gen 1");
+        toolbar.setTitle("POKEMON LIST");
         setSupportActionBar(toolbar);
 
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(showDetail, new IntentFilter(Common.KEY_ENABLE_HOME));
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(showEvolution, new IntentFilter(Common.KEY_NUM_EVOLUTION));
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                toolbar.setTitle("Pokemon List");
                 getSupportFragmentManager().popBackStack("Detail",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
+                toolbar.setTitle("POKEMON LIST");
+
 
                 break;
             default:
