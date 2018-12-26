@@ -30,9 +30,9 @@ public class MainActivity extends AppCompatActivity {
 
                 // replace fragement
                 Fragment detailFragment = PokemonDetail.getInstance();
-                int position = intent.getIntExtra("Position", -1);
+                String num = intent.getStringExtra("num");
                 Bundle bundle = new Bundle();
-                bundle.putInt("Position", position);
+                bundle.putString("num",num);
                 detailFragment.setArguments(bundle);
 
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction.commit();
 
                 // set pokemon name toolbar
-                Pokemon pokemon = Common.mListPokemon.get(position);
+                Pokemon pokemon = Common.findPokemonByNum(num);
                 toolbar.setTitle(pokemon.getName());
             }
         }
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolBar);
-        toolbar.setTitle("POKEMON LIST");
+        toolbar.setTitle("POKEDEX");
         setSupportActionBar(toolbar);
 
         LocalBroadcastManager.getInstance(this)
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 getSupportFragmentManager().popBackStack("Detail",FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                 getSupportActionBar().setDisplayShowTitleEnabled(false);
-                toolbar.setTitle("POKEMON LIST");
+                toolbar.setTitle("POKEDEX");
 
 
                 break;

@@ -46,7 +46,7 @@ public class PokemonDetail extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_pokemon_detail, container, false);
-        Pokemon pokemon;
+        Pokemon pokemon = Common.findPokemonByNum(getArguments().getString("num"));
 
         name = (TextView) view.findViewById(R.id.name);
         height = (TextView) view.findViewById(R.id.height);
@@ -67,13 +67,9 @@ public class PokemonDetail extends Fragment {
         rcv_next_evolution = (RecyclerView) view.findViewById(R.id.rcv_next_Evolution);
         rcv_next_evolution.setHasFixedSize(true);
         rcv_next_evolution.setLayoutManager(new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false));
-        if (getArguments().get("num") == null){
-            pokemon = Common.mListPokemon.get(getArguments().getInt("Position"));
-        }
-        else {
-            pokemon = Common.findPokemonByNum(getArguments().getString("num"));
-        }
+
         detailPokemon(pokemon);
+
         PokemonTypeAdapter typeAdapter = new PokemonTypeAdapter(getActivity(),pokemon.getType());
         rcv_type.setAdapter(typeAdapter);
 
@@ -82,6 +78,7 @@ public class PokemonDetail extends Fragment {
 
         PokemonEvolAdapter preEvolAdapter = new PokemonEvolAdapter(getActivity(),pokemon.getPrev_evolution());
         rcv_prev_evolution.setAdapter(preEvolAdapter);
+
         PokemonEvolAdapter nextEvolAdapter = new PokemonEvolAdapter(getActivity(),pokemon.getNext_evolution());
         rcv_next_evolution.setAdapter(nextEvolAdapter);
 

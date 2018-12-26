@@ -6,12 +6,15 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.mancj.materialsearchbar.MaterialSearchBar;
 import com.vu.pokedex.Adapter.PokemonAdapter;
 import com.vu.pokedex.Common.Common;
 import com.vu.pokedex.Common.ItemOffsetDecoration;
@@ -36,9 +39,13 @@ import retrofit2.Retrofit;
 public class FragmentPokemonList extends Fragment {
 
     static FragmentPokemonList instance;
+    PokemonAdapter adapter,search_adapter;
+
 
     RecyclerView recyclerView;
     TextView pkm_sum;
+    MaterialSearchBar materialSearchBar;
+    List<String> suggestion = new ArrayList<>();
 
     IPokeDex iPokeDex;
     CompositeDisposable compositeDisposable;
@@ -67,8 +74,64 @@ public class FragmentPokemonList extends Fragment {
         ItemOffsetDecoration itemOffsetDecoration = new ItemOffsetDecoration(getActivity(),R.dimen.spacing);
         recyclerView.addItemDecoration(itemOffsetDecoration);
         pkm_sum = (TextView) view.findViewById(R.id.pkm_sum_list);
+        materialSearchBar = (MaterialSearchBar)view.findViewById(R.id.search_bar);
+        materialSearchBar.setHint("Enter your Pokemon");
+        materialSearchBar.setCardViewElevation(10);
+        materialSearchBar.addTextChangeListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                List<String> suggest = new ArrayList<>();
+                for (String search: suggestion){
+                    if (search.toLowerCase().contains(materialSearchBar.getText().toLowerCase())){
+                        suggest.add(search);
+                    }
+                }
+                materialSearchBar.setLastSuggestions(suggest);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        materialSearchBar.setOnSearchActionListener(new MaterialSearchBar.OnSearchActionListener() {
+            @Override
+            public void onSearchStateChanged(boolean enabled) {
+                if (!enabled)
+                    recyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onSearchConfirmed(CharSequence text) {
+                startSearch(text);
+            }
+
+            @Override
+            public void onButtonClicked(int buttonCode) {
+
+            }
+        });
+
+
         fetchData();
         return view;
+    }
+
+    private void startSearch(CharSequence text) {
+        if (Common.mListPokemon.size() > 0){
+            List<Pokemon> result = new ArrayList<>();
+            for (Pokemon pokemon:Common.mListPokemon){
+                if (pokemon.getName().toLowerCase().contains(text.toString().toLowerCase()))
+                    result.add(pokemon);
+            }
+            search_adapter = new PokemonAdapter(getActivity(),result);
+            recyclerView.setAdapter(search_adapter);
+        }
     }
 
     private void fetchData() {
@@ -79,9 +142,15 @@ public class FragmentPokemonList extends Fragment {
                     @Override
                     public void accept(Pokedex pokedex) throws Exception {
                         Common.mListPokemon = pokedex.getPokemon();
-                        PokemonAdapter adapter = new PokemonAdapter(getActivity(),Common.mListPokemon);
+                        adapter = new PokemonAdapter(getActivity(),Common.mListPokemon);
                         recyclerView.setAdapter(adapter);
-                        pkm_sum.setText("Gen 1: " + String.valueOf(Common.mListPokemon.size()));
+                        pkm_sum.setText("Gen I: " + String.valueOf(Common.mListPokemon.size()));
+                        suggestion.clear();
+                        for (Pokemon pokemon:Common.mListPokemon){
+                            suggestion.add(pokemon.getName());
+                        }
+                        materialSearchBar.setVisibility(View.VISIBLE);
+                        materialSearchBar.setLastSuggestions(suggestion);
                     }
                 }));
     }
